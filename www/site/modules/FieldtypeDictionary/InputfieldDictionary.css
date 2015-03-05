@@ -1,0 +1,65 @@
+.InputfieldDictionary table tr {
+	border: none; 
+}
+
+.InputfieldDictionary th {
+	padding-bottom: 0;
+	font-weight: bold; 
+}
+
+.InputfieldDictionary tr.DictionaryTemplate {
+	display: none; 
+}
+
+.InputfieldDictionary tr:not(.DictionaryTBD):hover td {
+	background: #eee; 
+}
+
+.InputfieldDictionary input[type=text],
+.InputfieldDictionary input[type=date],
+.InputfieldDictionary input[type=number] {
+	width: 100%; 
+}
+.InputfieldDictionary th,
+.InputfieldDictionary td {
+	padding: 6px 2px; 
+	border-bottom: 1px solid #ddd; 
+}
+
+.InputfieldDictionary .DictionaryClone {
+	width: 3%; 
+	padding-left: 1%; 
+	text-align: center; 
+}
+
+.InputfieldDictionary .DictionaryFname {
+	width: 15%; 
+}
+
+.InputfieldDictionary .DictionaryLabel {
+	width: 25%; 
+}
+
+.InputfieldDictionary .DictionaryPlaceholder {
+	width: 20%; 
+}
+.InputfieldDictionary .DictionaryInstructions {
+	width: 40%; 
+}
+
+.InputfieldDictionary th.DictionaryDel {
+	width: 5%; 
+	padding-right: 0;
+
+}
+
+.InputfieldDictionary a.DictionaryClone,
+.InputfieldDictionary a.DictionaryDel {
+	width: 1.5em; 
+	display: block;
+}
+
+.InputfieldDictionary .DictionaryTBD td input {
+	text-decoration: line-through; 
+}
+

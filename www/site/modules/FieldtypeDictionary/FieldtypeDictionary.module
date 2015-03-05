@@ -1,0 +1,211 @@
+<?php
+
+/**
+ * A field that stores Dictionary each with a name, value
+ * 
+ * This is an example of creating your own Fieldtype to represent a spreadsheet type table of information.
+ *
+ */
+
+class FieldtypeDictionary extends FieldtypeMulti {
+
+	public static $defaultOptionValues = array();
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Dictionary',
+			'version' => 1,
+			'summary' => 'Field that stores a dictionary/associative-array (set of name/value pairs).',
+			'installs' => 'InputfieldDictionary', 
+			);
+	}
+
+	/**
+	 * Initialize this Fieldtype
+	 *
+	 */
+	public function init() {
+		parent::init();
+		$dir = dirname(__FILE__);
+		require_once("$dir/DictionaryEntry.php"); 
+		require_once("$dir/DictionaryEntryArray.php"); 
+	}
+
+	/**
+	 * Return the required Inputfield used to populate a field of this type
+	 *
+	 */
+	public function getInputfield(Page $page, Field $field) {
+		$inputfield = $this->modules->get("InputfieldDictionary"); 
+		// one per line
+		$inputfield->options = explode("\n",$field->select_options);
+
+		// our inputfield requires a Page and Field (most Inputfields don't)
+		$inputfield->setPage($page);
+		$inputfield->setField($field); 
+
+		return $inputfield; 
+	}
+
+	/**
+	 * Return a blank ready-to-populate version of a field of this type
+	 *
+	 */
+	public function getBlankValue(Page $page, Field $field) {
+		$res = new DictionaryEntryArray($page);
+		$res->setTrackChanges(true); 
+		return $res; 
+	}
+
+
+	/**
+	 * Given a raw value (value as stored in DB), return the value as it would appear in a Page object
+	 *
+     * @param Page $page
+     * @param Field $field
+     * @param string|int|array $value
+     * @return string|int|array|object $value
+     *
+     */
+    public function ___wakeupValue(Page $page, Field $field, $value) {
+
+		// if for some reason we already get a valid value, then just return it
+		if($value instanceof FormFieldArray) return $value; 
+
+		// start a blank value to be populated
+		$res = $this->getBlankValue($page, $field); 
+
+		// if we were given a blank value, then we've got nothing to do: just return a blank FormFieldArray
+		if(empty($value) || !is_array($value)) return $res; 
+
+		$opts = explode("\n", $field->select_options);
+
+		// create new DictionaryEntry objects from each item in the array
+		foreach($value as $v) {
+			$o = new DictionaryEntry();
+			$o->options = $opts;
+
+			// could this be generic?
+
+			$o->key = $v['data']; // note we're converting 'data' to 'dictname'
+			$o->value = $v['value']; 
+			$o->setTrackChanges(true); 
+			$res->add($o); 
+		}
+
+		$res->resetTrackChanges(); 
+
+        return $res;  
+    }
+
+    /**
+     * Given an 'awake' value, as set by wakeupValue, convert the value back to a basic type for storage in DB. 
+     *              
+     * @param Page $page
+     * @param Field $field
+     * @param string|int|array|object $value
+     * @return string|int
+     *
+     */
+    public function ___sleepValue(Page $page, Field $field, $value) {
+
+		$sleepValue = array();
+
+		// if we are given something other than an FormFieldArray, 
+		// then just return a blank array
+		if(!$value instanceof DictionaryEntryArray) return $sleepValue; 
+
+		// convert each FormField to an array within sleepValue
+		foreach($value as $o) {
+			$sleepValue[] = array(
+				'data' => $o->key, // note: fname is becoming data 
+				'value' => $o->value, 
+				); 
+		}
+		return $sleepValue;
+	}
+
+	/**
+	 * Given a value, make it clean for storage within a Page
+	 *
+	 */
+	public function sanitizeValue(Page $page, Field $field, $value) {
+
+		// if given a blank value, return a valid blank value
+		if(empty($value)) return $this->getBlankValue($page, $field, $value); 
+
+		// if given something other than an DictionaryArray, throw an error
+		if(!$value instanceof DictionaryEntryArray) {
+			throw new WireException("Value set to field '$field->name' must be an DictionaryFieldArray"); 
+		}
+
+		// note that sanitization of individual fields within a given DictionaryEntry is already 
+		// performed by the DictionaryEntry::set() method, so we don't need to do anything else here.
+
+		return $value; 	
+	}
+
+	/**
+	 * Format a value for output, called when a Page's outputFormatting is on
+	 *
+	 */
+	public function formatValue(Page $page, Field $field, $value) {
+		// we actually don't need to do anything in here since each FormField object
+		// is doing this work in the FormField::get() method. But I've included this
+		// comment here just to explain where that is taking place. 
+		return $value; 
+	}
+
+	/**
+	 * Return the database schema that defines an FormField
+	 *
+	 */
+	public function getDatabaseSchema(Field $field) {
+		$schema = parent::getDatabaseSchema($field); 
+
+		// 'data' is a required field for any Fieldtype, and we're using it to represent our 'fname' field
+		$schema['data'] = 'VARCHAR(30) NOT NULL'; 
+
+		// our text fields
+		$schema['value'] = 'TINYTEXT NOT NULL'; 
+
+		// indexes, for any fields that need to be searchable from selectors
+		// in this case, we're just making our 'fname' field searchable
+		// but the others could easily be added, likely as fulltext indexes
+		$schema['keys']['data'] = 'FULLTEXT KEY data (data)'; 
+
+		return $schema; 
+	}
+
+	/**
+	 * Method called when the field is database-queried from a selector 
+	 *
+	 */
+	public function getMatchQuery($query, $table, $subfield, $operator, $value) {
+
+		// If searching 'key' then assume our default (data) field 
+		if($subfield == 'key') $subfield = 'data';
+
+		return parent::getMatchQuery($query, $table, $subfield, $operator, $value); 
+	}
+
+	public function ___getConfigInputfields(Field $fields) {
+
+		$inputfields = parent::___getConfigInputfields($fields);
+
+		// list of options
+		$f = $this->modules->get("InputfieldTextarea");
+		$f->label = "Select Options for Key";
+		$f->attr('name', 'select_options');
+		$f->attr('value', count($fields->select_options) > 0 ? $fields->select_options : implode("\r\n",self::$defaultOptionValues));
+		$f->attr('rows', 5);
+		$f->description = "The list of options that are available for this drop down";
+		$f->notes = "Each option should be typed on its own line. If you would like an option/label pair, use := to separate the values.	For instance 1:=Poor, 2:=Excellent. The value stored in the database would be the first part of the pair (1 and 2 respectively) and the latter would be displayed in the dropdown.";
+		$inputfields->append($f);
+
+		return $inputfields;
+	}
+
+
+}
+

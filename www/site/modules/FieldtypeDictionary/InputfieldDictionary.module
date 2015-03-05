@@ -1,0 +1,156 @@
+<?php
+
+class InputfieldDictionary extends Inputfield {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Dictionary',
+			'version' => 3,
+			'summary' => 'Input field for Dictionary.',
+			'requires' => 'FieldtypeDictionary', 
+			);
+	}
+
+	protected $page;
+	protected $field; 
+	public $options;
+
+	public function setPage(Page $page) {
+		$this->page = $page; 
+	}
+
+	public function setField(Field $field) {
+		$this->field = $field;
+	}
+
+	/**
+	 * Render a table row for an individual Dictionary input
+	 *
+	 */
+	protected function renderRow(DictionaryEntry $o, $cnt, $class = 'Dictionary') {
+
+		$name = $this->attr('name');
+		$key = $this->sanitizer->entities($o->key); 
+		$value = $this->sanitizer->entities($o->value); 
+
+		$opts = '';
+		// add options to the input field
+		foreach($this->options as $option) {
+			$valueLabel = explode(':=',$option);
+			if (count($valueLabel) == 1) { // if option/label pair *not* provided
+				// use sanitized value as value because whitespaces and special characters are not allowed
+				$val = $this->sanitizer->name(trim($valueLabel[0])); 
+				// use given value as label
+				$label = trim($valueLabel[0]); 
+			} else if (count($valueLabel) == 2){ // if option/label pair provided
+				$val = trim($valueLabel[0]);
+				$label = trim($valueLabel[1]);
+			}
+			if ($val != '' && ($label != '' || $label == NULL)) {
+				if(!strlen($val)) continue;
+				$selected = ($key===$val) ? " selected='selected'" : '';
+				$opts .= "<option$selected value='{$val}'>{$label}</option>";
+			}
+		}
+
+		$out = "
+			<tr class='Dictionary$cnt $class'>
+				<td><a href='#' class='DictionaryClone'><span class='ui-icon ui-icon-copy'></span></a></td>
+				<td><select name='{$name}_key[]' >{$opts}</select></td>
+				<td><input type='text' name='{$name}_value[]' value='$value' /></td>
+				<td>
+					<a href='#' class='DictionaryDel ui-helper-clearfix'><span class='ui-icon ui-icon-trash'></span></a>
+					<input type='hidden' name='{$name}_del[]' value='0' />
+				</td>
+			</tr>
+			";
+
+		return $out; 
+	}
+
+	/**
+	 * Render the entire input area for Dictionary
+	 *
+	 */
+	public function ___render() {
+
+		// get Dictionary template for creating new Dictionary
+		$tbody = $this->renderRow(new DictionaryEntry(), 0, 'Dictionary DictionaryTemplate'); 
+		
+		// render rows for existing Dictionary	
+		foreach($this->attr('value') as $cnt => $Dictionary) {
+			$tbody .= $this->renderRow($Dictionary, $cnt); 
+		}	
+
+		$out = 	"
+		<table class='InputfieldDictionary'>
+			<thead>
+			<tr class=''>
+				<th class='DictionaryClone'>&nbsp;</th>
+				<th class='DictionaryFname'>Key</th>
+				<th class='DictionaryLabel'>Value</th>
+				<th class='DictionaryDel'>
+					<a title='Delete All' href='#' class='DictionaryDel'><span class='ui-icon ui-icon-trash'></span></a>
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			$tbody
+			</tbody>
+		</table>
+		";
+
+		// add a button that triggers adding a new event
+		$btn = $this->modules->get('InputfieldButton');
+		$btn->attr('id', $this->attr('name') . "_new"); 
+		$btn->class .= " InputfieldDictionaryAdd";
+		$btn->icon = 'plus-sign';
+		$btn->value = $this->_('Add New Dictionary Entry'); 
+		$out .= $btn->render();
+
+		return $out; 
+	}
+
+	/**
+	 * Process input for the Dictionary inputs
+	 *
+	 */
+	public function ___processInput(WireInputData $input) {
+
+		if(!$this->page || !$this->field) {
+			throw new WireException("This inputfield requires that you set valid 'page' and 'field' properties to it."); 
+		}
+
+		$name = $this->attr('name'); 
+		$res = $this->field->type->getBlankValue($this->page, $this->field); 
+		$numDeleted = 0; 
+
+		foreach($input->{"{$name}_key"} as $cnt => $key) {
+
+			if(!$cnt) continue; // template for 'new' item is the first, so we can ignore it
+
+			// check if the item is being deleted
+			if($input->{"{$name}_del"}[$cnt]) {
+				// if being deleted, then we simply skip over it
+				$numDeleted++;
+				continue; 
+			}
+
+			// create the $o and add it to our $res
+			$o = new DictionaryEntry();
+			$o->options = $this->options;
+			$o->key = $key; 
+			$o->value = $input->{"{$name}_value"}[$cnt];
+			$res->add($o); 
+		}
+
+		// if the string values of the processed Dictionary are different from the previous,
+		// or if any Dictionary have been deleted, then flag this Inputfield as changed
+		// so that it will be automatically saved with the page
+		if("$res" != "$this->value" || $numDeleted) {
+			$this->attr('value', $res); 
+			$this->trackChange('value'); 
+		}
+	}
+}
+
