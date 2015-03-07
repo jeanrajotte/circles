@@ -1,0 +1,18 @@
+<!-- new.html -->
+
+<div class="new-wizard-container">
+  <tabset>
+    <tab ng-repeat="stage in stages" heading="{{stage.heading}}" ui-sref="{{stage.route}}" ui-sref-active="active" active="stage.active">
+      <div ui-view></div>
+    </tab>
+  </tabset>
+</div>
+<div class="row wizard-controls">
+    <div class="col-xs-12">
+      <button ng-click="wizardProgress('cancel')" class="btn btn-default">Cancel</button>
+      <button ng-click="wizardProgress('next')" class="btn btn-info pull-right wizard-button">Next</button>
+      <button ng-click="wizardProgress('previous')" class="btn btn-info pull-right wizard-button">Previous</button>
+    </div>
+</div>
+
+

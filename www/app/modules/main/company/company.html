@@ -1,0 +1,7 @@
+<section class="panel-mitel">
+	<tabset>
+	    <tab ng-repeat="item in items" heading="{{item.heading}}" ui-sref="{{item.route}}" ui-sref-active="active" active="item.active">
+	        <div ui-view></div>
+	    </tab>
+	</tabset>
+</section>

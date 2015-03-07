@@ -1,0 +1,19 @@
+<section class="container-fluid panel-mitel">
+	<div class="row-mitel" controller='Notifications'>
+		<p ng-repeat="msg in msgs.msgs" class="alert alert-{{msg.type}}">{{msg.message}}</p>
+	</div>
+	<div class="row-mitel" id="links">
+		<a ng-repeat="link in company.links" target="_blank" class="btn" href="{{link.url}}" ><img ng-src="{{link.image}}" alt="{{link.name}}"\><span>{{link.name}}</span> </a>
+		<a class="btn btn-default">+</a>
+	</div>
+	<div class="row-mitel" id="help-videos">
+		<div ng-repeat="video in company.videos" class="video">
+			<h4>{{video.title}}</h4>
+			<div video-embed="video" class="video-btn" modal-tpl="modal-video"> h </div>
+			<p>{{video.description}}</p>
+		</div>
+
+	</div>
+
+
+</section>

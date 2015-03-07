@@ -1,0 +1,51 @@
+<!-- new.step2.html -->
+<div class="row step-container">
+  <div class="col-xs-12">
+    <div class="dropdown" dropdown>
+      <button class="btn btn-default dropdown-toggle" dropdown-toggle>Dialing Privileges | <span class="caret"></button>
+      <ul class="dropdown-menu">
+        <li><a>Some</a></li>
+        <li><a>None</a></li>
+        <li><a>All</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <table class="table table-striped table-responsive">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Basic</th>
+          <th>Silver</th>
+          <th>Gold</th>
+          <th>Diamond</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr ng-repeat="bundle in bundles">
+            <td>
+              {{bundle.name}}
+            </td>
+            <td><div ng-show="{{bundle.basic}}"><i class="fa fa-check"></i></div></td>
+            <td><div ng-show="{{bundle.silver}}"><i class="fa fa-check"></i></div></td>
+            <td><div ng-show="{{bundle.gold}}"><i class="fa fa-check"></i></div></td>
+            <td><div ng-show="{{bundle.diamond}}"><i class="fa fa-check"></i></div></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Remaining: 1</td>
+            <td>Remaining: 1</td>
+            <td>Remaining: 1</td>
+            <td>Remaining: 1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><button class="btn btn-default">Select</button></td>
+            <td><button class="btn btn-default">Select</button></td>
+            <td><button class="btn btn-default">Select</button></td>
+            <td><button class="btn btn-default">Select</button></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<!-- new.html -->
+
+<div class="new-wizard-container">
+  <tabset>
+    <tab ng-repeat="step in steps" heading="{{step.heading}}" ui-sref="{{step.route}}" ui-sref-active="active" active="step.active">
+      <div ui-view></div>
+    </tab>
+  </tabset>
+</div>
+
+<div class="row wizard-controls">
+  <div class="col-xs-12">
+    <button ng-click="wizardProgress('cancel')" class="btn btn-default">Cancel</button>
+    <button ng-show="!lastStep" ng-click="wizardProgress('next')" class="btn btn-info pull-right wizard-button">Next</button>
+    <button ng-show="lastStep" ng-click="wizardProgress('save')" class="btn btn-info pull-right wizard-button">Save</button>
+    <button ng-click="wizardProgress('previous')" class="btn btn-info pull-right wizard-button">Previous</button>
+  </div>
+</div>
+

@@ -1,0 +1,45 @@
+<!-- user.list.html -->
+
+<div id="teams-header-container" class="row">
+    <div id="panel-header" class="col-xs-12">
+      <div class="section-header">
+        <span>Team List</span>
+        <span class="pull-right"><i class="fa fa-pencil"></i></span>
+      </div>
+    </div>
+</div>
+<div id="teams-table-container" class="row panel-table-container">
+    <div class="col-xs-12">
+      <div class="container-fluid panel-mitel">
+        <div class="row">
+          <div class="col-xs-4">
+            <button id="add-team-btn" class="btn btn-primary" ng-click="newTeam()">Add Team</button>                
+          </div>
+          <div class="col-xs-4">
+            <!-- column spacer -->
+          </div>
+          <div class="col-xs-4">
+            <input class="form-control" type="text" ng-model="search" placeholder="Filter teams"></input>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <table st-table="teams" class="table table-striped">
+              <thead>
+                <tr>
+                  <th st-sort="name">Name</th>
+                  <th st-sort="count">User Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="team in teams | filter: search">
+                  <td>{{team.name}}</td>
+                  <td>{{team.userCount}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

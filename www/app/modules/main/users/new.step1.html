@@ -1,0 +1,36 @@
+<!-- new.step1.html -->
+<div class="row step-container">
+  <div class="col-xs-5">
+    <button class="btn btn-info">Copy existing user</button>
+  </div>
+  <div class="col-xs-7">
+    <form name="user-step1">
+    <div class="form-group">
+      <label>First name: *</label>
+      <input type="text" class="form-control" ng-model="userStep1.fname.value" />
+      <p ng-show="userStep1.fname.missing" class="alert alert-danger">First name is required</p>
+    </div>
+    <div class="form-group">
+      <label>Last name:</label>
+      <input type="text" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Home Phone:</label>
+      <input type="tel" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Mobile Phone:</label>
+      <input type="tel" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>is Administrator: </label>
+      <select class="form-control">
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<!-- user.list.html -->
+
+<div id="users-header-container" class="row">
+    <div id="panel-header" class="col-xs-12">
+      <div class="section-header">
+        <span>User List</span>
+        <span class="pull-right"><i class="fa fa-pencil"></i></span>
+      </div>
+    </div>
+</div>
+<div id="user-table-container" class="row">
+    <div class="col-xs-12">
+      <div class="container-fluid panel-mitel">
+        <div class="row">
+          <div class="col-xs-4">
+            <button id="add-user-btn" class="btn btn-primary" ng-click="newUser()">Add User</button>                
+          </div>
+          <div class="col-xs-4">
+            <!-- column spacer -->
+          </div>
+          <div class="col-xs-4">
+            <input class="form-control" type="text" ng-model="search" placeholder="Filter users"></input>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <table st-table="users" class="table table-striped">
+              <thead>
+                <tr>
+                  <th st-sort="firstName">First Name</th>
+                  <th st-sort="lastName">Last Name</th>
+                  <th st-sort="email">Email</th>
+                  <th st-sort="homePhone">Home Phone</th>
+                  <th st-sort="mobilePhone">Mobile Phone</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="user in users | filter: search">
+                  <td>{{user.firstName}}</td>
+                  <td>{{user.lastName}}</td>
+                  <td>{{user.email}}</td>
+                  <td>{{user.homePhone}}</td>
+                  <td>{{user.mobilePhone}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
